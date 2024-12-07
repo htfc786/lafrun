@@ -26,6 +26,7 @@ import url from 'url'
 import { LspWebSocket } from './support/lsp'
 import { createCloudSdk } from './support/cloud-sdk'
 import { FunctionCache } from './support/engine'
+import { ConfChangeStream } from './support/database-change-stream/conf-change-stream'
 
 require('source-map-support').install({
   emptyCacheBetweenOperations: true,
@@ -38,9 +39,12 @@ globalThis.createCloudSdk = createCloudSdk
 
 const app = express()
 
-DatabaseAgent.ready.then(() => {
-  DatabaseChangeStream.initialize()
-})
+// 监控数据库变化
+// DatabaseAgent.ready.then(() => {
+//   DatabaseChangeStream.initialize()
+// })
+FunctionCache.initialize()
+ConfChangeStream.initialize()
 
 app.use(
   cors({

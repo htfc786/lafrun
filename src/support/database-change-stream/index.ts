@@ -41,6 +41,7 @@ export class DatabaseChangeStream extends EventEmitter {
   }
 
   initializeForCollection(collectionName: string) {
+    // TODO watch本地文件
     const stream = DatabaseAgent.db.collection(collectionName).watch()
 
     stream.on('change', (change) => {

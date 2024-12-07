@@ -9,10 +9,16 @@ dotenv.config()
  * configuration management
  */
 export default class Config {
+
+  static get PATH() {
+    return "D:/test_20230502081635"
+  }
+
   /**
    * mongodb connection configuration
    */
   static get DB_URI() {
+    process.env['DB_URI'] = "mongodb://localhost:27017/"
     if (!process.env['DB_URI']) {
       throw new Error('env: `DB_URI` is missing')
     }
@@ -23,6 +29,7 @@ export default class Config {
    * the server secret salt, mainly used for generating tokens
    */
   static get SERVER_SECRET(): string {
+    process.env['SERVER_SECRET'] = 'secret'
     const secret_salt = process.env['SERVER_SECRET']
     if (!secret_salt) {
       throw new Error('env: `SERVER_SECRET` is missing')
@@ -48,6 +55,7 @@ export default class Config {
    * the object depth limit when logging
    */
   static get LOG_DEPTH(): number {
+
     const depth = (process.env['LOG_DEPTH'] as any) ?? 1
     if (depth < 0) {
       return 0
@@ -70,10 +78,12 @@ export default class Config {
    * in production deploy or not
    */
   static get isProd(): boolean {
+    process.env['NODE_ENV'] = 'development'
     return process.env.NODE_ENV === 'production'
   }
 
   static get RUNTIME_IMAGE(): string {
+    process.env.RUNTIME_IMAGE = 'lafyun/runtime-node:latest'
     return process.env.RUNTIME_IMAGE
   }
 
@@ -82,6 +92,7 @@ export default class Config {
   }
 
   static get APPID(): string {
+    process.env.APPID = 'test'
     return process.env.APPID ?? process.env.APP_ID
   }
 
@@ -110,10 +121,12 @@ export default class Config {
   }
 
   static get OSS_EXTERNAL_ENDPOINT(): string {
+    process.env.OSS_EXTERNAL_ENDPOINT = 'https://oss-cn-beijing.aliyuncs.com'
     return process.env.OSS_EXTERNAL_ENDPOINT
   }
 
   static get DISABLE_MODULE_CACHE(): boolean {
+    process.env.DISABLE_MODULE_CACHE = 'false'
     return process.env.DISABLE_MODULE_CACHE === 'true'
   }
 

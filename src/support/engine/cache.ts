@@ -3,29 +3,58 @@ import { logger } from '../logger'
 import { DatabaseAgent } from '../../db'
 import { CLOUD_FUNCTION_COLLECTION } from '../../constants'
 import { InitHook } from '../init-hook'
-import { DatabaseChangeStream } from '../database-change-stream'
+// import { DatabaseChangeStream } from '../database-change-stream'
 import { FunctionModule } from './module'
 import { ChangeStreamDocument } from 'mongodb'
+import { Local } from '../../local'
 
 export class FunctionCache {
   private static cache: Map<string, ICloudFunctionData> = new Map()
 
+
   static async initialize(): Promise<void> {
     logger.info('initialize function cache')
-    const funcs = await DatabaseAgent.db
-      .collection<ICloudFunctionData>(CLOUD_FUNCTION_COLLECTION)
-      .find()
-      .toArray()
+    // TODO 从本地读取
+    // const funcs = await DatabaseAgent.db
+    //   .collection<ICloudFunctionData>(CLOUD_FUNCTION_COLLECTION)
+    //   .find()
+    //   .toArray()
+    const funcs = Local.loudCloudFunctions()
 
     for (const func of funcs) {
       FunctionCache.cache.set(func.name, func)
     }
 
-    DatabaseChangeStream.onStreamChange(
-      CLOUD_FUNCTION_COLLECTION,
-      FunctionCache.streamChange.bind(this),
-    )
-    logger.info('Function cache initialized.')
+    // 数据库变化时，清空缓存
+    // DatabaseChangeStream.onStreamChange(
+    //   CLOUD_FUNCTION_COLLECTION,
+    //   FunctionCache.streamChange.bind(this),
+    // )
+    // logger.info('Function cache initialized.')
+
+    // 手塞函数
+    FunctionCache.cache.set("hello",{
+      id: "",
+      appid: "000000",
+      name: "",
+      source: {
+        code: `exports.main = function () {
+  return "hello world!";
+};`,
+        compiled: null,
+        uri: null,
+        version: 1,
+        hash: null,
+        lang: null,
+      },
+      desc: "",
+      tags: [],
+      methods: ["GET"],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      createdBy: "htfc786",
+    })
+    console.log(FunctionCache.cache)
 
     // invoke init function
     InitHook.invoke()

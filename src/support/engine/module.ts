@@ -6,6 +6,7 @@ import * as vm from 'vm'
 import { createRequire } from 'node:module'
 import * as path from 'node:path'
 import { ObjectId } from 'mongodb'
+import { compileTs2js } from '../lang'
 
 export const CUSTOM_DEPENDENCY_NODE_MODULES_PATH = `${Config.CUSTOM_DEPENDENCY_BASE_PATH}/node_modules/`
 
@@ -16,6 +17,7 @@ export class FunctionModule {
 
   static get(functionName: string): any {
     const moduleName = `@/${functionName}`
+    console.log(moduleName)
     return this.require(moduleName, [])
   }
 
@@ -54,7 +56,14 @@ export class FunctionModule {
       if (!data) {
         throw new Error(`function ${fn} not found`)
       }
-      const mod = this.compile(fn, data.source.compiled, fromModule)
+      // TODO
+      let code = data.source.compiled
+      if (!code) {
+        code = compileTs2js(data.source.code, fn)
+        data.source.compiled = code
+      }
+      const mod = this.compile(fn, code, fromModule)
+      console.log(mod)
 
       // cache module
       if (!Config.DISABLE_MODULE_CACHE) {
@@ -135,6 +144,7 @@ export class FunctionModule {
       },
     } as any
 
+    console.log(code,_options)
     const script = new vm.Script(code, _options)
     return script
   }

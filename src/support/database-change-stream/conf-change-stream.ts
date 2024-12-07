@@ -1,10 +1,11 @@
 import { CONFIG_COLLECTION } from '../../constants'
 import { DatabaseAgent } from '../../db'
+import { Local } from '../../local'
 import { DatabaseChangeStream } from '.'
-// import {
-//   installDependencies,
-//   uninstallDependencies,
-// } from '../module-hot-reload'
+import {
+  installDependencies,
+  uninstallDependencies,
+} from '../module-hot-reload'
 
 export class ConfChangeStream {
   static dependencies = []
@@ -18,9 +19,12 @@ export class ConfChangeStream {
   }
 
   private static async updateConfig(init = false) {
-    const conf = await DatabaseAgent.db
-      .collection(CONFIG_COLLECTION)
-      .findOne({})
+    // TODO
+    // const conf = await DatabaseAgent.db
+    //   .collection(CONFIG_COLLECTION)
+    //   .findOne({})
+    console.log('updateConfig')
+    const conf = Local.loudConf()
 
     if (!conf) {
       return
@@ -40,28 +44,28 @@ export class ConfChangeStream {
     hot reload dependencies
     */
 
-    // const newDeps = []
-    // const unneededDeps = []
+    const newDeps = []
+    const unneededDeps = []
 
-    // for (const dep of conf.dependencies) {
-    //   if (!ConfChangeStream.dependencies.includes(dep)) {
-    //     newDeps.push(dep)
-    //   }
-    // }
+    for (const dep of conf.dependencies) {
+      if (!ConfChangeStream.dependencies.includes(dep)) {
+        newDeps.push(dep)
+      }
+    }
 
-    // for (const dep of ConfChangeStream.dependencies) {
-    //   if (!conf.dependencies.includes(dep)) {
-    //     unneededDeps.push(dep)
-    //   }
-    // }
+    for (const dep of ConfChangeStream.dependencies) {
+      if (!conf.dependencies.includes(dep)) {
+        unneededDeps.push(dep)
+      }
+    }
 
-    // ConfChangeStream.dependencies = conf.dependencies
+    ConfChangeStream.dependencies = conf.dependencies
 
-    // if (newDeps.length > 0) {
-    //   installDependencies(newDeps)
-    // }
-    // if (unneededDeps.length > 0) {
-    //   uninstallDependencies(unneededDeps)
-    // }
+    if (newDeps.length > 0) {
+      installDependencies(newDeps)
+    }
+    if (unneededDeps.length > 0) {
+      uninstallDependencies(unneededDeps)
+    }
   }
 }

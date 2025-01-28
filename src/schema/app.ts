@@ -33,24 +33,4 @@ export class AppSchema {
     const configPath = path.join(getAppPath(), APP_SCHEMA_NAME)
     return exist(configPath)
   }
-
-  // static async refresh() { /// TODO
-  //   const appSchema = this.read()
-  //   // const app = await applicationControllerFindOne(appSchema.appid)
-  //   const timestamp = Date.parse(new Date().toString()) / 1000
-
-  //   appSchema.function = {
-  //     developToken: app.develop_token,
-  //     developTokenExpire: timestamp + DEBUG_TOKEN_EXPIRE,
-  //   }
-
-  //   appSchema.storage = {
-  //     endpoint: app.storage.endpoint,
-  //     accessKeyId: app.storage.accessKey,
-  //     accessKeySecret: app.storage.secretKey,
-  //     expire: timestamp + STORAGE_TOKEN_EXPIRE,
-  //   }
-
-  //   this.write(appSchema)
-  // }
 }

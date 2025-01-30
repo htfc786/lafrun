@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
+import { command as runCommand } from './command/run/'
 import { command as applicationCommand } from './command/application/'
 import { command as functionCommand } from './command/function/'
 
@@ -16,5 +17,6 @@ program.option('-v, --version', 'output version').action((options) => {
 
 program.addCommand(applicationCommand())
 program.addCommand(functionCommand())
+program.addCommand(runCommand())
 
 program.parse(process.argv)

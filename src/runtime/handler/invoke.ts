@@ -59,8 +59,6 @@ async function invokeFunction(
 
   const name = ctx.__function_name
 
-  console.log('invoke function', name)
-
   let func = FunctionCache.get(name)
   if (!func) {
     func = FunctionCache.get(DEFAULT_FUNCTION_NAME)

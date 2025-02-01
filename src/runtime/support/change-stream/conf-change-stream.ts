@@ -1,6 +1,3 @@
-import { CONFIG_COLLECTION } from '../../constants'
-import { Local } from '../../local'
-// import { DatabaseChangeStream } from '.'
 import {
   installDependencies,
   uninstallDependencies,
@@ -22,7 +19,6 @@ export class ConfChangeStream {
     // const conf = await DatabaseAgent.db
     //   .collection(CONFIG_COLLECTION)
     //   .findOne({})
-    console.log('updateConfig')
     const conf = Local.loudConf()
 
     if (!conf) {

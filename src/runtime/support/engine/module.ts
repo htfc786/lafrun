@@ -17,7 +17,6 @@ export class FunctionModule {
 
   static get(functionName: string): any {
     const moduleName = `@/${functionName}`
-    console.log(moduleName)
     return this.require(moduleName, [])
   }
 
@@ -63,7 +62,6 @@ export class FunctionModule {
         data.source.compiled = code
       }
       const mod = this.compile(fn, code, fromModule)
-      console.log(mod)
 
       // cache module
       if (!Config.DISABLE_MODULE_CACHE) {
@@ -144,7 +142,6 @@ export class FunctionModule {
       },
     } as any
 
-    console.log(code,_options)
     const script = new vm.Script(code, _options)
     return script
   }

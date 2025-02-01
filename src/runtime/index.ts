@@ -1,133 +1,52 @@
-/*
- * @Author: Maslow<wangfugen@126.com>
- * @Date: 2021-07-30 10:30:29
- * @LastEditTime: 2022-01-20 13:55:22
- * @Description:
- */
+import Config from './config'
+import { logger } from './support/logger'
 
 import express from 'express'
-import cors from 'cors'
-
-import { parseToken, splitBearerToken } from './support/token'
-import Config from './config'
 import { router } from './handler/router'
-import { logger } from './support/logger'
-import { GetClientIPFromRequest, generateUUID } from './support/utils'
-import { WebSocketAgent } from './support/ws'
-import { DatabaseAgent } from './db'
-import xmlparser from 'express-xml-bodyparser'
+import * as init from './init'
+import { FunctionCache } from './support/engine/cache'
+import { ICloudFunctionData } from './support/engine/types'
 
 // init static method of class
 import './support/cloud-sdk'
-import url from 'url'
 
-// import { LspWebSocket } from './support/lsp'
 import { createCloudSdk } from './support/cloud-sdk'
-import { FunctionCache } from './support/engine'
-import { ConfChangeStream } from './support/change-stream/conf-change-stream'
 
-require('source-map-support').install({
-  emptyCacheBetweenOperations: true,
-  overrideRetrieveFile: true,
-  retrieveFile: (path) => FunctionCache.get(path)?.source.compiled,
-})
+export function run(functions: ICloudFunctionData[], options?: any) {
+  logger.info('lafjs runtime start...')
 
-// hack: set createCloudSdk to global object to make it available in @lafjs/cloud package
-globalThis.createCloudSdk = createCloudSdk
+  // load config
+  /// TODO
+  // load function
+  FunctionCache.initialize(functions)
 
-const app = express()
+  // init source map support
+  init.initSourceMapSupport()
 
-// 监控数据库变化
-// DatabaseAgent.ready.then(() => {
-//   DatabaseChangeStream.initialize()
-// })
-FunctionCache.initialize()
-ConfChangeStream.initialize()
+  // set createCloudSdk to global
+  // hack: set createCloudSdk to global object to make it available in @lafjs/cloud package
+  globalThis.createCloudSdk = createCloudSdk
 
-app.use(
-  cors({
-    origin: true,
-    methods: '*',
-    exposedHeaders: '*',
-    credentials: true,
-    maxAge: 86400,
-  }),
-)
+  const app = express()
 
-// fix x-real-ip while gateway not set
-app.use((req, _res, next) => {
-  if (!req.headers['x-real-ip']) {
-    req.headers['x-real-ip'] = GetClientIPFromRequest(req)
-  }
-  next()
-})
+  // init app
+  init.initExpressApp(app)
+  
+  // init error catcher
+  init.initErrorCatcher()
 
-app.use(express.json({ limit: Config.REQUEST_LIMIT_SIZE }) as any)
-app.use(
-  express.urlencoded({
-    limit: Config.REQUEST_LIMIT_SIZE,
-    extended: true,
-  }) as any,
-)
-app.use(
-  express.raw({
-    limit: Config.REQUEST_LIMIT_SIZE,
-  }) as any,
-)
+  // use router
+  app.use(router)
 
-app.use(xmlparser())
+  // start server
+  const server = app.listen(Config.PORT, () =>
+    logger.info(`server ${process.pid} listened on ${Config.PORT}`),
+  )
 
-process.on('unhandledRejection', (reason, promise) => {
-  logger.error(`Caught unhandledRejection:`, reason, promise)
-})
+  // WebSocket upgrade & connect
+  init.initWebSocket(server)
 
-process.on('uncaughtException', (err) => {
-  logger.error(`Caught uncaughtException:`, err)
-})
-
-/**
- * Parsing bearer token
- */
-app.use(function (req, res, next) {
-  const token = splitBearerToken(req.headers['authorization'] ?? '')
-  const auth = parseToken(token) || null
-  req['user'] = auth
-
-  const requestId = (req['requestId'] =
-    req.headers['x-request-id'] || generateUUID())
-  res.set('request-id', requestId)
-  next()
-})
-
-app.use(router)
-
-const server = app.listen(Config.PORT, () =>
-  logger.info(`server ${process.pid} listened on ${Config.PORT}`),
-)
-
-/**
- * WebSocket upgrade & connect
- */
-server.on('upgrade', (req, socket, head) => {
-  const pathname = req.url ? url.parse(req.url).pathname : undefined
-  if (pathname === '/_/lsp') {
-    /// TODO
-    // LspWebSocket.handleUpgrade(req, socket, head)
-    return
-  }
-
-  WebSocketAgent.server.handleUpgrade(req, socket as any, head, (client) => {
-    WebSocketAgent.server.emit('connection', client, req)
-  })
-})
-
-process.on('SIGTERM', gracefullyExit)
-process.on('SIGINT', gracefullyExit)
-
-async function gracefullyExit() {
-  await DatabaseAgent.accessor.close()
-  await server.close()
-
-  logger.info('process gracefully exited!')
-  process.exit(0)
+  // gracefully Exit
+  init.initGracefullyExit(server)
 }
+export default run;

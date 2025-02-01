@@ -1,4 +1,3 @@
-import { Local } from '../../runtime/local';
 import * as path from 'node:path'
 import * as fs from 'node:fs'
 import { getBaseDir } from '../../util/sys'
@@ -22,7 +21,6 @@ export function run(
   }
   // console.log(funcPath, options)
   // 1. load config
-  Local.initConf({})
   // 2. load function
   const nameList = getLocalFuncNames(funcPath)
   const funcList = nameList.map(name => {
@@ -53,9 +51,9 @@ export function run(
       createdBy: "",
     }
   })
-  Local.initFunc(funcList)
   // 3. run function
-  require('../../runtime')
+  const run = require('../../runtime')
+  run(funcList, options)
 }
 
 function getDir(pathStr?: string): string {

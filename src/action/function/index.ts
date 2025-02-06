@@ -1,14 +1,14 @@
 import * as path from 'node:path'
 import * as fs from 'node:fs'
-import * as Table from 'cli-table3'
+import Table from 'cli-table3'
 import { exist, remove } from '../../util/file'
 import { getEmoji } from '../../util/print'
 import { getBaseDir } from '../../util/sys'
-import { FUNCTION_SCHEMA_DIRECTORY } from '../../common/constant'
 import { confirm } from '../../common/prompts'
 import { FunctionSchema } from '../../schema/function'
-import { lstatSync } from 'fs'
 import { CreateFunctionDto } from '../../types'
+import { getLocalFuncNames, removeFunction } from '../../common/function'
+import { FUNCTION_CODE_SUFFIX, FUNCTION_SCHEMA_DIRECTORY } from '../../common/constant'
 
 export async function create(
   funcName: string,
@@ -43,7 +43,7 @@ export async function create(
     tags: createDto.tags,
   }
   FunctionSchema.write(createDto.name, functionSchema)
-  const codePath = path.join(getBaseDir(), 'functions', createDto.name + '.ts')
+  const codePath = path.join(getBaseDir(), FUNCTION_SCHEMA_DIRECTORY, createDto.name + FUNCTION_CODE_SUFFIX)
   fs.writeFileSync(codePath, createDto.code)
   // finish!
   console.log(`${getEmoji('✅')} function ${funcName} created`)
@@ -51,7 +51,7 @@ export async function create(
 
 export async function list() {
   // get local functions
-  const funcNames = getLocalFuncs()
+  const funcNames = getLocalFuncNames()
 
   const table = new Table({
     head: ['name', 'desc', 'websocket', 'methods', 'tags'],
@@ -68,6 +68,9 @@ export async function list() {
   }
 
   console.log(table.toString())
+  if (funcNames.length === 0) {
+    console.log(`${getEmoji('⚠️')} no functions found, create one first!`)
+  }
 }
 
 export async function del(funcName: string) {
@@ -85,7 +88,7 @@ export async function del(funcName: string) {
   // delete function
   FunctionSchema.delete(funcName)
 
-  const funcPath = path.join(getBaseDir(), 'functions', funcName + '.ts')
+  const funcPath = path.join(getBaseDir(), FUNCTION_SCHEMA_DIRECTORY, funcName + FUNCTION_CODE_SUFFIX)
   if (exist(funcPath)) {
     remove(funcPath)
   }
@@ -104,7 +107,7 @@ export async function del(funcName: string) {
 //   },
 // ) {
 //   // compile code
-//   const codePath = path.join(getBaseDir(), 'functions', funcName + '.ts')
+//   const codePath = path.join(getBaseDir(), 'functions', funcName + FUNCTION_CODE_SUFFIX)
 //   if (!exist(codePath)) {
 //     console.error(`${getEmoji('❌')} function ${funcName} not found, please pull or create it!`)
 //     process.exit(1)
@@ -158,40 +161,3 @@ export async function del(funcName: string) {
 //     await printLog(appSchema.appid, res.requestId)
 //   }
 // }
-
-function getLocalFuncs(): string[] {
-  const funcDir = path.join(getBaseDir(), FUNCTION_SCHEMA_DIRECTORY)
-  const funcs = getLocalFunction(funcDir, '')
-  return funcs
-}
-
-function getLocalFunction(dir: string, prefix: string): string[] {
-  const files = fs.readdirSync(dir)
-  const funcNames: string[] = []
-  files.forEach((file) => {
-    const filePath = path.join(dir, file)
-    const stat = lstatSync(filePath)
-    if (stat.isDirectory()) {
-      funcNames.push(...getLocalFunction(filePath, path.join(prefix || '', file)))
-    }
-    if (stat.isFile() && file.endsWith('.ts')) {
-      funcNames.push(
-        path
-          .join(prefix || '', file)
-          .replace(/\\/g, '/')
-          .replace(/\.ts$/, ''),
-      )
-    }
-  })
-  return funcNames
-}
-
-function removeFunction(name: string) {
-  if (FunctionSchema.exist(name)) {
-    FunctionSchema.delete(name)
-  }
-  const funcPath = path.join(getBaseDir(), 'functions', name + '.ts')
-  if (exist(funcPath)) {
-    remove(funcPath)
-  }
-}

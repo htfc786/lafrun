@@ -2,7 +2,10 @@
   "name": "lafrun",
   "version": "0.1.0",
   "description": "The laf runtime",
-  "main": "main.js",
+  "main": "dist/main.js",
+  "bin": {
+    "lafrun": "dist/main.js"
+  },
   "scripts": {
     "dev": "tsc -w",
     "watch": "tsc -p tsconfig.json -w",

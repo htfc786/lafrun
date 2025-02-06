@@ -1,4 +1,4 @@
-import * as prompts from 'prompts'
+import prompts from 'prompts'
 
 export async function confirm(message: string) {
   return await prompts({

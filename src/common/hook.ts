@@ -7,20 +7,20 @@ export function checkApplication() {
   }
 }
 
-export async function checkFunctionDebugToken() {
-  const appSchema = AppSchema.read()
-  const { developToken, developTokenExpire } = appSchema.function
-  const timestamp = Date.parse(new Date().toString()) / 1000
-  if (!developToken || developTokenExpire < timestamp) {
-    await AppSchema.refresh()
-  }
-}
+// export async function checkFunctionDebugToken() {
+//   const appSchema = AppSchema.read()
+//   const { developToken, developTokenExpire } = appSchema.function
+//   const timestamp = Date.parse(new Date().toString()) / 1000
+//   if (!developToken || developTokenExpire < timestamp) {
+//     await AppSchema.refresh()
+//   }
+// }
 
-export async function checkStorageToken() {
-  const appSchema = AppSchema.read()
-  const { expire } = appSchema.storage
-  const timestamp = Date.parse(new Date().toString()) / 1000
-  if (expire < timestamp) {
-    await AppSchema.refresh()
-  }
-}
+// export async function checkStorageToken() {
+//   const appSchema = AppSchema.read()
+//   const { expire } = appSchema.storage
+//   const timestamp = Date.parse(new Date().toString()) / 1000
+//   if (expire < timestamp) {
+//     await AppSchema.refresh()
+//   }
+// }

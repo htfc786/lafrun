@@ -18,6 +18,43 @@ export class AppSchema {
     sessionToken?: string
     expire: number
   }
+  // add
+  database?: {
+    uri?: string
+    database?: string
+    username?: string
+    password?: string
+    host?: string
+    port?: number
+  }
+  logConfig?: {
+    level?: string
+    displayLineLevel?: string
+    depth?: number
+    server?: {
+      url?: string
+      token?: string
+    }
+  }
+  server?: {
+    port?: number
+    secret?: string
+    request?: {
+      limitSize?: string
+    }
+    config?: {
+      disableModuleCache?: boolean
+    }
+  }
+  develop?: {
+    disable?: boolean
+    changeInterval?: number
+  }
+  dependency?: {
+    npmInstallFllags?: string
+    baseDir?: string
+  }
+  environments?: object
 
   static read(): AppSchema {
     const configPath = path.join(getAppPath(), APP_SCHEMA_NAME)

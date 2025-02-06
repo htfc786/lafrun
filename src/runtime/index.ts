@@ -5,20 +5,17 @@ import express from 'express'
 import { router } from './handler/router'
 import * as init from './init'
 import { FunctionCache } from './support/engine/cache'
-import { ICloudFunctionData } from './support/engine/types'
 
 // init static method of class
 import './support/cloud-sdk'
 
 import { createCloudSdk } from './support/cloud-sdk'
 
-export function run(functions: ICloudFunctionData[], options?: any) {
+export function run(funcPath?: string) {
   logger.info('lafjs runtime start...')
 
-  // load config
-  /// TODO
-  // load function
-  FunctionCache.initialize(functions)
+  // initialize function
+  FunctionCache.initialize(funcPath)
 
   // init source map support
   init.initSourceMapSupport()

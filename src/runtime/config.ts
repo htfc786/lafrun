@@ -9,18 +9,13 @@ dotenv.config()
  * configuration management
  */
 export default class Config {
-
-  static get PATH() {
-    return process.argv.slice(2)
-  }
-
   /**
    * mongodb connection configuration
    */
   static get DB_URI() {
-    process.env['DB_URI'] = "mongodb://localhost:27017/"
     if (!process.env['DB_URI']) {
-      throw new Error('env: `DB_URI` is missing')
+      process.env['DB_URI'] = 'mongodb://127.0.0.1:27017'
+      console.warn(`not set dburi, the default dburi ${process.env['DB_URI']} will be used`)
     }
     return process.env['DB_URI']
   }
@@ -29,10 +24,10 @@ export default class Config {
    * the server secret salt, mainly used for generating tokens
    */
   static get SERVER_SECRET(): string {
-    process.env['SERVER_SECRET'] = 'secret'
     const secret_salt = process.env['SERVER_SECRET']
     if (!secret_salt) {
-      throw new Error('env: `SERVER_SECRET` is missing')
+      console.warn('not set server secret!')
+      return ''
     }
     return secret_salt
   }
@@ -70,10 +65,6 @@ export default class Config {
     return (process.env.__PORT ?? 8000) as number
   }
 
-  static get STORAGE_PORT(): number {
-    return (process.env.__STORAGE_PORT ?? 9000) as number
-  }
-
   /**
    * in production deploy or not
    */
@@ -83,16 +74,14 @@ export default class Config {
   }
 
   static get RUNTIME_IMAGE(): string {
-    process.env.RUNTIME_IMAGE = 'lafyun/runtime-node:latest'
-    return process.env.RUNTIME_IMAGE
+    return process.env.RUNTIME_IMAGE ?? 'lafyun/runtime-node:latest'
   }
 
   static get RUNTIME_VERSION(): string {
-    return require('../package.json')?.version
+    return require('../../package.json')?.version
   }
 
   static get APPID(): string {
-    process.env.APPID = 'test'
     return process.env.APPID ?? process.env.APP_ID
   }
 
@@ -126,8 +115,7 @@ export default class Config {
   }
 
   static get DISABLE_MODULE_CACHE(): boolean {
-    process.env.DISABLE_MODULE_CACHE = 'false'
-    return process.env.DISABLE_MODULE_CACHE === 'true'
+    return (process.env.DISABLE_MODULE_CACHE || 'false') === 'true'
   }
 
   static get CUSTOM_DEPENDENCY_BASE_PATH(): string {

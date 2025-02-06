@@ -169,3 +169,39 @@ export function uninstallDependencies(packageName: string[]) {
       )
     })
 }
+
+let dependenciesNameList = []
+
+/*
+  hot reload dependencies
+*/
+export function dependenciesHotReload(deps: string[], init = false) {
+  if (init) {
+    dependenciesNameList = deps
+    return
+  }
+  
+  const newDeps = []
+  const unneededDeps = []
+
+  for (const dep of deps) {
+    if (!dependenciesNameList.includes(dep)) {
+      newDeps.push(dep)
+    }
+  }
+
+  for (const dep of dependenciesNameList) {
+    if (!deps.includes(dep)) {
+      unneededDeps.push(dep)
+    }
+  }
+
+  dependenciesNameList = deps
+
+  if (newDeps.length > 0) {
+    installDependencies(newDeps)
+  }
+  if (unneededDeps.length > 0) {
+    uninstallDependencies(unneededDeps)
+  }
+}

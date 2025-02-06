@@ -1,15 +1,15 @@
 import { ICloudFunctionData } from './types'
-import { DatabaseAgent } from '../../db'
-import { CLOUD_FUNCTION_COLLECTION } from '../../constants'
 import { InitHook } from '../init-hook'
-import { FunctionModule } from './module'
-import { ChangeStreamDocument } from 'mongodb'
+import { getAllFunction } from '../../../common/function'
 
 export class FunctionCache {
   private static cache: Map<string, ICloudFunctionData> = new Map()
 
 
-  static initialize(funcs: ICloudFunctionData[]) {
+  static initialize(funcPath) {
+    // load function
+    const funcs = getAllFunction(funcPath)
+
     // init cache
     for (const func of funcs) {
       FunctionCache.cache.set(func.name, func)

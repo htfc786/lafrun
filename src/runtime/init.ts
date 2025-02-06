@@ -15,25 +15,25 @@ import { WebSocketAgent } from './support/ws'
 import { DatabaseAgent } from './db'
 // import { LspWebSocket } from './support/lsp'
 
-async function main() {
-  try {
-    installPackages()
-  } catch (error) {
-    logger.error(error)
-    return 1
-  }
+// async function main() {
+//   try {
+//     installPackages()
+//   } catch (error) {
+//     logger.error(error)
+//     return 1
+//   }
 
-  return 0
-}
+//   return 0
+// }
 
-main()
-  .then((code) => {
-    process.exit(code)
-  })
-  .catch((err) => {
-    logger.error(err)
-    process.exit(2)
-  })
+// main()
+//   .then((code) => {
+//     process.exit(code)
+//   })
+//   .catch((err) => {
+//     logger.error(err)
+//     process.exit(2)
+//   })
 
 /**
  * Install packages

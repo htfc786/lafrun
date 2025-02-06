@@ -5,14 +5,11 @@ export function command(): Command {
   const cmd = program
     .command('run [path]')
     .description('run app')
-    .option('-p, --port [port]', 'port', '3000')
-    .option('-h, --host [host]', 'host', 'localhost')
+    .option('-p, --port [port]', 'port', '8000')
     .option('-d, --debug', 'debug mode', false)
+    .option('--db [dburi]', 'mongoDB uri', null)
+    .option('--secret [secret]', 'server secret', null)
     .action((path, options) => {
-      // if (!path) { 
-      //   console.log('Please provide a path!')
-      //   return
-      // }
       run(path, options)
     })
 

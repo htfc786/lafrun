@@ -24,6 +24,7 @@ export const PROJECT_SCHEMA_NAME = 'laf.yaml'
 export const USER_SCHEMA_NAME = 'user.yaml'
 export const FUNCTION_SCHEMA_DIRECTORY = 'functions'
 export const FUNCTION_SCHEMA_SUFFIX = '.yaml'
+export const FUNCTION_CODE_SUFFIX = '.ts'
 export const DEPLOY_SCHEMA_NAME = 'deploy.yaml'
 export const ENVIRONMENT_SCHEMA_NAME = '.env'
 

@@ -7,9 +7,9 @@ import { createRequire } from 'node:module'
 import * as path from 'node:path'
 import { ObjectId } from 'mongodb'
 import { compileTs2js } from '../lang'
-
+console.dir(Config)
 export const CUSTOM_DEPENDENCY_NODE_MODULES_PATH = `${Config.CUSTOM_DEPENDENCY_BASE_PATH}/node_modules/`
-
+// export const CUSTOM_DEPENDENCY_NODE_MODULES_PATH = `../node_modules/`
 export class FunctionModule {
   protected static cache: Map<string, any> = new Map()
 
